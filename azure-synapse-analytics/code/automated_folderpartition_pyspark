@@ -1,0 +1,11 @@
+%%pyspark
+from pyspark.sql.functions import year, month, dayofmonth
+df = spark.read.load('abfss://adlsgen2-filesystem@azuredemostorageacc.dfs.core.windows.net/raw/green_tripdata_2023-01.parquet', format='parquet')
+display(df.limit(10))
+
+
+df.withColumn("Year", year("lpep_pickup_datetime")) \
+    .withColumn("Month", month("lpep_pickup_datetime")) \
+    .withColumn("Day", dayofmonth("lpep_pickup_datetime"))
+
+df.write.partitionBy("Year","Month","Day").mode("overwrite").save('abfss://adlsgen2-filesystem@azuredemostorageacc.dfs.core.windows.net/Cleaned/')
